@@ -25,7 +25,7 @@ def rsvp(userName, yyyymmdd, hhmm, attend, conn):
     query = """INSERT OR REPLACE INTO rsvps
     (rowid, event, participant, dateTime, attend, timestamp) VALUES
     ((SELECT rowid FROM rsvps WHERE event=? AND participant=? AND dateTime=?), ?, ?, ?, ?, ?)"""
-    result = conn.execute(query, (eventId, userId, dateId, eventId, userId, dateId, attend, now)).fetchall()
+    result = conn.execute(query, (eventId, userId, dateId, eventId, userId, dateId, int(attend), now)).fetchall()
     return result
 
 @click.command()
@@ -36,9 +36,10 @@ def rsvp(userName, yyyymmdd, hhmm, attend, conn):
 @click.option('--yyyymmdd', help='Year-month-day')
 def run(file, name, yyyymmdd, hhmm, attend):
     conn = sqlite3.connect(file)
-    rsvp(name, yyyymmdd, hhmm, attend, conn)
+    result = rsvp(name, yyyymmdd, hhmm, attend, conn)
+    conn.commit()
     conn.close()
-    return
+    return result
 
 if __name__ == '__main__':
     run()
